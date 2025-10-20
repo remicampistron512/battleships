@@ -13,16 +13,16 @@ class Ship:
         self.misses_list = misses_list
 
     def compute_coordinates(self,length, ship_data, starting_x, starting_y):
-        for i in range(0, length):
-            if ship_data["direction"] == "vertical":
-                self.coordinates_list.append(starting_coord_x + (chr(ord(starting_coord_y) + i)))
-            elif ship_data["direction"] == "horizontal":
-                ship_data["ship_coordinates_list"].append((chr(ord(starting_coord_x) + i)) + starting_coord_y)
+        for i in range(0, self.length):
+            if self.direction == "vertical":
+                self.coordinates_list.append(self.starting_x + (chr(ord(self.starting_y) + i)))
+            elif self.direction == "horizontal":
+                self.coordinates_list.append((chr(ord(self.starting_x) + i)) + self.starting_y)
 
     def add_to_list(self):
         Ship.ships_list.append(self)
 
-    def shoot(coordinates, ships):
+    def shoot(self,coordinates, ships):
         """
         On tire, On compare les coordonnées enregistrées pour tous les navires avec les coordonnées du tir
         :param coordinates:
@@ -49,7 +49,7 @@ class Ship:
                 break
 
         if not is_a_hit and is_a_miss:
-            misses_list.append(coordinates)
+            Ship.misses_list.append(coordinates)
             print('raté')
         return ships
 
