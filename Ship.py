@@ -28,7 +28,7 @@ class Ship:
 
 
 
-    def compute_coordinates(self,length, ship_data, starting_x, starting_y):
+    def compute_coordinates(self):
         for i in range(0, self.length):
             if self.direction == "vertical":
                 self.coordinates_list.append(self.starting_x + (chr(ord(self.starting_y) + i)))

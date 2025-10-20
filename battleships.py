@@ -10,10 +10,19 @@ if __name__ == '__main__':
     torpedo_boat = Ship("torpedo_boat", "horizontal", 2, "e", "9")
 
     aircraft_carrier.add_to_list()
+    aircraft_carrier.compute_coordinates()
+
     cruiser.add_to_list()
+    cruiser.compute_coordinates()
+
     destroyer.add_to_list()
+    destroyer.compute_coordinates()
+
     submarine.add_to_list()
+    submarine.compute_coordinates()
+
     torpedo_boat.add_to_list()
+    torpedo_boat.compute_coordinates()
 
     print(Ship.ships_list)
     misses_list = []
