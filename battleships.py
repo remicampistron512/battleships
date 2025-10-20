@@ -39,11 +39,13 @@ if __name__ == '__main__':
             break
         if ask_coordinates.check_coordinates(shot_coordinates):
             shot_coordinates_validated = ask_coordinates.check_coordinates(shot_coordinates)
-            Ship.shoot(shot_coordinates_validated, Ship.ships_list)
-            grid = Grid(Ship.ships_list, misses_list)
+            Ship.shoot(shot_coordinates_validated)
+            grid = Grid()
+            grid.create_col_headings()
+            grid.create_rows(Ship.ships_list, misses_list)
             endgame = True
             for a_ship in Ship.ships_list:
-                if a_ship["ship_coordinates_list"]:
+                if a_ship.coordinates_list:
                     endgame = False
             if endgame:
                 print("GAME OVER")

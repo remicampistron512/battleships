@@ -2,7 +2,8 @@
 
 class Ship:
     ships_list = []
-    def __init__(self, name, direction, length, starting_x, starting_y, coordinates_list=None, hit_list=None, misses_list=None):
+    misses_list = []
+    def __init__(self, name, direction, length, starting_x, starting_y, coordinates_list=None, hit_list=None):
         if coordinates_list is None:
             coordinates_list = []
         self.name = name
@@ -21,10 +22,7 @@ class Ship:
         else:
             self.hit_list = hit_list
 
-        if misses_list is None:
-            self.misses_list = []
-        else:
-            self.misses_list = misses_list
+
 
 
 
@@ -38,7 +36,8 @@ class Ship:
     def add_to_list(self):
         Ship.ships_list.append(self)
 
-    def shoot(self,coordinates, ships):
+    @classmethod
+    def shoot(cls,coordinates):
         """
         On tire, On compare les coordonnées enregistrées pour tous les navires avec les coordonnées du tir
         :param coordinates:
@@ -47,16 +46,16 @@ class Ship:
         """
         is_a_hit = False
         is_a_miss = False
-        for ship in ships:
+        for ship in cls.ships_list:
             if not is_a_hit:
-                for ship_coordinates in ship["ship_coordinates_list"]:
+                for ship_coordinates in ship.coordinates_list:
                     if not is_a_hit:
                         if ship_coordinates == coordinates:
                             print("touché")
-                            ship["length"] = ship["length"] - 1
-                            ship["ship_coordinates_list"].remove(coordinates)
-                            ship["ship_hit_list"].append(coordinates)
-                            if not ship["ship_coordinates_list"]:
+                            ship.length = ship.length - 1
+                            ship.coordinates_list.remove(coordinates)
+                            ship.hit_list.append(coordinates)
+                            if not ship.coordinates_list:
                                 print("coulé !!!")
                             is_a_hit = True
                         else:
@@ -65,9 +64,9 @@ class Ship:
                 break
 
         if not is_a_hit and is_a_miss:
-            Ship.misses_list.append(coordinates)
+            cls.misses_list.append(coordinates)
             print('raté')
-        return ships
+        return "miss", None
 
     def __repr__(self):
         return (f"Ship(name={self.name!r}, direction={self.direction!r}, "
