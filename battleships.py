@@ -16,8 +16,12 @@ if __name__ == '__main__':
     torpedo_boat.add_to_list()
 
     print(Ship.ships_list)
-
     misses_list = []
+    grid = Grid()
+    grid.create_col_headings()
+    grid.create_rows(Ship.ships_list,misses_list)
+
+
 
     while True:
         ask_coordinates = UserInput()

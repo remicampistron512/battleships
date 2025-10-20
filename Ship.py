@@ -2,15 +2,31 @@
 
 class Ship:
     ships_list = []
-    def __init__(self,name,direction,length,starting_x,starting_y,coordinates_list=list,hit_list=list,misses_list=list):
+    def __init__(self, name, direction, length, starting_x, starting_y, coordinates_list=None, hit_list=None, misses_list=None):
+        if coordinates_list is None:
+            coordinates_list = []
         self.name = name
         self.direction = direction
         self.length = length
         self.starting_x = starting_x
         self.starting_y = starting_y
-        self.coordinates_list = coordinates_list
-        self.hit_list = hit_list
-        self.misses_list = misses_list
+
+        if coordinates_list is None:
+            self.coordinates_list = []
+        else:
+            self.coordinates_list = coordinates_list
+
+        if hit_list is None:
+            self.hit_list = []
+        else:
+            self.hit_list = hit_list
+
+        if misses_list is None:
+            self.misses_list = []
+        else:
+            self.misses_list = misses_list
+
+
 
     def compute_coordinates(self,length, ship_data, starting_x, starting_y):
         for i in range(0, self.length):
