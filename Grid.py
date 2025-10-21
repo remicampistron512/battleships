@@ -6,23 +6,21 @@ class Grid:
         self.ships = ships
         self.miss_list = miss_list
 
-
-    def create_rows(self, ships, miss_list):
+    @classmethod
+    def create_rows(cls, ships, miss_list):
         """
-           Créer la grille sans les entêtes
-           :param miss_list:
-           :param rows_headings:
-           :param cols_headings:
-           :param ships:
-           :return:
-           """
+        Créer la grille sans les entêtes
+        :param ships: la liste des navires membre de la classe Ship
+        :param miss_list:
+        :return:
+        """
         i = 0
         j = 0
-        for row in Grid.rows_headings:
+        for row in cls.rows_headings:
             print("+---" * (len(Grid.cols_headings) + 1) + "+")
             print(f"{row:>2}", end='  | ')
 
-            for col in Grid.cols_headings:
+            for col in cls.cols_headings:
                 ship_in_square = False
                 ship_hit_in_square = False
                 missed_square = False
@@ -50,18 +48,19 @@ class Grid:
             i += 1
         j += 1
 
-    def create_col_headings(self):
+    @classmethod
+    def create_col_headings(cls):
         """
           Créer les entêtes de la grille
           :param cols_headings:
           :return:
           """
-        print("+---" * (len(Grid.cols_headings) + 1) + "+")
+        print("+---" * (len(cls.cols_headings) + 1) + "+")
         i = 0
-        for col in Grid.cols_headings:
+        for col in cls.cols_headings:
             if i == 0:
                 print("     "f"{col:>2}", end=" |")
-            elif i == len(Grid.cols_headings) - 1:
+            elif i == len(cls.cols_headings) - 1:
                 print(f"{col:>2}", end=' |\n')
             else:
                 print(f"{col:>2}", end=' |')
