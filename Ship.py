@@ -1,11 +1,10 @@
-
-
 class Ship:
     """
     Gère les navires et leurs coordonnées ainsi que l'action de tir de l'utilisateur
     """
     ships_list = []
     misses_list = []
+
     def __init__(self, name, direction, length, starting_x, starting_y, coordinates_list=None, hit_list=None):
         if coordinates_list is None:
             coordinates_list = []
@@ -25,10 +24,6 @@ class Ship:
         else:
             self.hit_list = hit_list
 
-
-
-
-
     def compute_coordinates(self):
         """
          Définit les coordonnées d'un navire selon sa direction
@@ -40,7 +35,6 @@ class Ship:
             elif self.direction == "horizontal":
                 self.coordinates_list.append((chr(ord(self.starting_x) + i)) + self.starting_y)
 
-
     def add_to_list(self):
         """
          Constitue la liste des navires
@@ -49,7 +43,7 @@ class Ship:
         Ship.ships_list.append(self)
 
     @classmethod
-    def shoot(cls,coordinates):
+    def shoot(cls, coordinates):
         """
         On tire, On compare les coordonnées enregistrées pour tous les navires avec les coordonnées du tir
         :param coordinates:
@@ -87,4 +81,3 @@ class Ship:
         return (f"Ship(name={self.name!r}, direction={self.direction!r}, "
                 f"length={self.length}, start=({self.starting_x},{self.starting_y}), "
                 f"coords={self.coordinates_list}, hits={self.hit_list})")
-

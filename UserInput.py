@@ -3,8 +3,6 @@ class UserInput:
     def __init__(self):
         self.coordinates = input("sur quelle case voulez vous tirer ? (q pour quitter) :")
 
-
-
     def check_coordinates(self):
         """
         Vérifie que les données entrées sont valides
@@ -18,6 +16,3 @@ class UserInput:
         else:
             print("merci de rentrer des coordonnées valides")
             return False
-
-
-

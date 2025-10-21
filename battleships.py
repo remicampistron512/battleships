@@ -31,9 +31,7 @@ if __name__ == '__main__':
     # Créé et affiche la grille
     grid = Grid()
     grid.create_col_headings()
-    grid.create_rows(Ship.ships_list,misses_list)
-
-
+    grid.create_rows(Ship.ships_list, misses_list)
 
     while True:
         # demande à l'utilisateur de rentrer les coordonnées du tir
