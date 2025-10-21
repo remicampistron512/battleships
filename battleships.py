@@ -38,14 +38,13 @@ if __name__ == '__main__':
     while True:
         # demande à l'utilisateur de rentrer les coordonnées du tir
         ask_coordinates = UserInput()
-        # récupère les coordonnées du tir
-        shot_coordinates = ask_coordinates.ask_coordinates()
+
         # l'utilisateur quitte la partie
-        if shot_coordinates == "q":
+        if ask_coordinates.coordinates == "q":
             break
-        if ask_coordinates.check_coordinates(shot_coordinates):
+        if ask_coordinates.check_coordinates():
             # valide les coordonnées
-            shot_coordinates_validated = ask_coordinates.check_coordinates(shot_coordinates)
+            shot_coordinates_validated = ask_coordinates.check_coordinates()
             # l'utilisateur tire
             Ship.shoot(shot_coordinates_validated)
             # la grille est mise à jour
