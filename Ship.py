@@ -6,8 +6,6 @@ class Ship:
     misses_list = []
 
     def __init__(self, name, direction, length, starting_x, starting_y, coordinates_list=None, hit_list=None):
-        if coordinates_list is None:
-            coordinates_list = []
         self.name = name
         self.direction = direction
         self.length = length
