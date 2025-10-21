@@ -1,13 +1,13 @@
 class Grid:
     cols_headings = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     rows_headings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    def __init__(self, ships=None, miss_list=None):
+    miss_list = []
+    def __init__(self, ships=None):
         self.ships = ships
-        self.miss_list = miss_list
+
 
     @classmethod
-    def create_rows(cls, ships, miss_list):
+    def create_rows(cls, ships,misses_list):
         """
         Créer la grille sans les entêtes
         :param ships: la liste des navires membre de la classe Ship
@@ -36,7 +36,7 @@ class Grid:
                                 print("o", end=" | ")
                                 ship_in_square = True
                 if not ship_in_square and not ship_hit_in_square:
-                    for miss in miss_list:
+                    for miss in misses_list:
                         if miss == col.lower() + "" + str(row).lower():
                             print("x", end=" | ")
                             missed_square = True

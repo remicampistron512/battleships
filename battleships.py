@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # Créé et affiche la grille
     grid = Grid()
     grid.create_col_headings()
-    grid.create_rows(Ship.ships_list, misses_list)
+    grid.create_rows(Ship.ships_list,Ship.misses_list)
 
     while True:
         # demande à l'utilisateur de rentrer les coordonnées du tir
@@ -48,7 +48,7 @@ if __name__ == '__main__':
             # la grille est mise à jour
             grid = Grid()
             grid.create_col_headings()
-            grid.create_rows(Ship.ships_list, misses_list)
+            grid.create_rows(Ship.ships_list,Ship.misses_list)
             endgame = True
             # tant que la liste des coordonnées n'est pas vide, la partie continue
             for a_ship in Ship.ships_list:
