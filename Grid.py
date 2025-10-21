@@ -51,10 +51,9 @@ class Grid:
     @classmethod
     def create_col_headings(cls):
         """
-          Créer les entêtes de la grille
-          :param cols_headings:
-          :return:
-          """
+         Créer les entêtes de la grille
+        :return:
+        """
         print("+---" * (len(cls.cols_headings) + 1) + "+")
         i = 0
         for col in cls.cols_headings:

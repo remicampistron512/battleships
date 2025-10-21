@@ -53,8 +53,7 @@ class Ship:
         """
         On tire, On compare les coordonnées enregistrées pour tous les navires avec les coordonnées du tir
         :param coordinates:
-        :param ships:
-        :return: la liste des navires avec leurs coordonnées mises à jour
+        :return:
         """
         is_a_hit = False
         is_a_miss = False
@@ -78,7 +77,7 @@ class Ship:
         if not is_a_hit and is_a_miss:
             cls.misses_list.append(coordinates)
             print('raté')
-        return "miss", None
+        return "raté", None
 
     def __repr__(self):
         """
