@@ -1,5 +1,10 @@
 (function () {
   var app = angular.module('battleshipsApp', []);
+
+  app.config(function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+  });
   var uiConfigElement = document.getElementById('ui-config');
   var initialConfig = uiConfigElement ? JSON.parse(uiConfigElement.textContent) : {};
   var gridSize = initialConfig.grid_size || 10;

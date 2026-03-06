@@ -1,6 +1,7 @@
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from .logic import GRID_SIZE, apply_shot, board_remaining_ships, new_state_for_size, next_enemy_target
@@ -8,6 +9,7 @@ from .models import GameSettings
 
 
 @require_GET
+@ensure_csrf_cookie
 def index(request):
     settings = GameSettings.load()
     return render(
