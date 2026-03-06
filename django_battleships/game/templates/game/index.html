@@ -13,7 +13,10 @@
       <h1>Battleships</h1>
       <p>Back-end: Django API. Front-end: AngularJS + Canvas UI.</p>
       <p><a href="/admin/">Admin settings</a> (configure grid size and colors).</p>
-      <button ng-click="game.startNewGame()">Start New Game</button>
+      <div class="controls">
+        <button ng-click="game.startNewGame()">Start New Game</button>
+        <button ng-click="game.solveGame()" ng-disabled="game.isSolverRunning">Solve Automatically</button>
+      </div>
       <p class="status">{{ game.statusMessage }}</p>
 
       <section class="boards">
@@ -31,6 +34,17 @@
           <canvas id="playerCanvas" width="420" height="420"></canvas>
         </div>
       </section>
+
+      <div class="result-popup" ng-if="game.showResultPopup">
+        <div class="result-popup__card">
+          <h2>{{ game.popupTitle }}</h2>
+          <p>{{ game.popupMessage }}</p>
+          <div class="controls controls--popup">
+            <button ng-click="game.startNewGame()">Play Again</button>
+            <button ng-click="game.closePopup()">Close</button>
+          </div>
+        </div>
+      </div>
     </main>
     {{ ui_config|json_script:"ui-config" }}
     <script src="/static/game/app.js"></script>
