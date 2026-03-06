@@ -1,52 +1,24 @@
-# Bataille navale (terminal Python)
+# Battleships
 
-Ce projet propose une version simple de la bataille navale en terminal.
+This repository now includes a web implementation of Battleships using:
 
-## Installation
+- **Django** for the backend API
+- **AngularJS** for the frontend behavior
+- **HTML Canvas** for all board rendering and visual styling
 
-1. Assurez-vous d'avoir Python 3 installé.
-2. Clonez le dépôt.
-3. Lancez le jeu :
-
-```bash
-python battleships.py
-```
-
-## Utilisation
-
-Le jeu vous demande des coordonnées de tir.
-
-Formats acceptés : `A1`, `c7`, `J10`.
-
-Pour quitter : `q`.
-
-## Règles du jeu
-
-- Si le tir touche un navire : `touché`
-- Si toutes les cases d'un navire sont touchées : `coulé !!!`
-- Quand tous les navires sont coulés : `GAME OVER`
-
-## Structure du code
-
-- `battleships.py` : boucle principale + classe `Game`
-- `UserInput.py` : validation et normalisation des coordonnées
-- `Ship.py` : modèle navire (coordonnées, impacts, état coulé)
-- `Grid.py` : rendu de la grille
-- `tests/` : tests unitaires de base
-
-## Lancer les tests
+## Run locally
 
 ```bash
-python -m unittest discover -s tests
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python django_battleships/manage.py migrate
+python django_battleships/manage.py runserver
 ```
 
-## Limitations connues
+Open `http://127.0.0.1:8000/`.
 
-- Placement des navires statique (pas encore aléatoire)
-- Jeu solo uniquement
+## API endpoints
 
-## Roadmap
-
-- Ajouter un placement aléatoire des navires
-- Ajouter un mode debug pour afficher les navires non touchés
-- Ajouter plus de tests sur l'affichage de la grille
+- `POST /api/new-game/` starts a new game in session state.
+- `POST /api/fire/` with JSON `{ "row": <int>, "col": <int> }` fires at enemy grid.

@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1220;
+  color: #f3f4f6;
+}
+
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+button {
+  background: #06b6d4;
+  color: #0f172a;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.boards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 1.2rem;
+}
+
+canvas {
+  border: 2px solid #38bdf8;
+  background: #082f49;
+  border-radius: 0.4rem;
+}
+
+.status {
+  min-height: 1.5rem;
+}
