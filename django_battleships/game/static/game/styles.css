@@ -21,6 +21,18 @@ button {
   cursor: pointer;
 }
 
+button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
 .boards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
@@ -35,4 +47,28 @@ canvas {
 
 .status {
   min-height: 1.5rem;
+}
+
+.result-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.result-popup__card {
+  width: min(420px, 100%);
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  border-radius: 0.6rem;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 16px 36px rgba(14, 165, 233, 0.25);
+}
+
+.controls--popup {
+  margin-top: 1rem;
+  margin-bottom: 0;
 }

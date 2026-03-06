@@ -26,6 +26,10 @@
     vm.statusMessage = 'Press "Start New Game" to begin.';
     vm.playerView = buildEmpty();
     vm.playerBoard = buildEmpty();
+    vm.showResultPopup = false;
+    vm.popupTitle = '';
+    vm.popupMessage = '';
+    vm.isSolverRunning = false;
 
     vm.startNewGame = function () {
       $http.post('/api/new-game/').then(function (response) {
@@ -40,6 +44,10 @@
         };
         vm.playerView = buildEmpty();
         vm.playerBoard = buildEmpty();
+        vm.showResultPopup = false;
+        vm.popupTitle = '';
+        vm.popupMessage = '';
+        vm.isSolverRunning = false;
         resizeCanvases();
         vm.statusMessage = 'Game started. Fire at enemy waters.';
         drawBoards();
@@ -47,7 +55,7 @@
     };
 
     vm.handleEnemyClick = function (event) {
-      if (vm.statusMessage.indexOf('won') > -1) {
+      if (isGameOver() || vm.isSolverRunning) {
         return;
       }
       var target = event.target;
@@ -57,14 +65,64 @@
       var row = Math.floor(y / cellSize);
       var col = Math.floor(x / cellSize);
 
+      fireAt(row, col, false);
+    };
+
+    vm.closePopup = function () {
+      vm.showResultPopup = false;
+    };
+
+    vm.solveGame = function () {
+      if (vm.isSolverRunning || isGameOver()) {
+        return;
+      }
+      vm.isSolverRunning = true;
+      vm.showResultPopup = false;
+      runSolverTurn();
+    };
+
+    function runSolverTurn() {
+      if (!vm.isSolverRunning || isGameOver()) {
+        vm.isSolverRunning = false;
+        return;
+      }
+
+      var nextTarget = findNextUntargetedCell(vm.playerView);
+      if (!nextTarget) {
+        vm.isSolverRunning = false;
+        vm.statusMessage = 'Solver stopped: no untargeted cells remain.';
+        return;
+      }
+
+      fireAt(nextTarget.row, nextTarget.col, true);
+    }
+
+    function findNextUntargetedCell(board) {
+      for (var row = 0; row < gridSize; row += 1) {
+        for (var col = 0; col < gridSize; col += 1) {
+          if (board[row][col] === '~' || board[row][col] === 'S') {
+            return { row: row, col: col };
+          }
+        }
+      }
+      return null;
+    }
+
+    function isGameOver() {
+      return vm.statusMessage.indexOf('won') > -1;
+    }
+
+    function fireAt(row, col, fromSolver) {
       $http.post('/api/fire/', { row: row, col: col }).then(
         function (response) {
           vm.playerView = response.data.player_view;
           vm.playerBoard = response.data.player_board;
           if (response.data.status === 'player_won') {
             vm.statusMessage = 'You won!';
+            openResultPopup('Victory!', 'You sank all enemy ships.');
           } else if (response.data.status === 'enemy_won') {
             vm.statusMessage = 'Enemy won. Try again!';
+            openResultPopup('Defeat', 'Your fleet has been sunk.');
           } else {
             var enemyTurn = response.data.enemy_turn;
             vm.statusMessage =
@@ -79,12 +137,30 @@
               '.';
           }
           drawBoards();
+
+          if (fromSolver) {
+            if (response.data.status === 'active') {
+              window.setTimeout(runSolverTurn, 120);
+            } else {
+              vm.isSolverRunning = false;
+            }
+          }
         },
         function (error) {
           vm.statusMessage = error.data.error || 'Unable to fire.';
+          if (fromSolver) {
+            vm.isSolverRunning = false;
+          }
         }
       );
-    };
+    }
+
+    function openResultPopup(title, message) {
+      vm.popupTitle = title;
+      vm.popupMessage = message;
+      vm.showResultPopup = true;
+      vm.isSolverRunning = false;
+    }
 
     function buildEmpty() {
       var result = [];
