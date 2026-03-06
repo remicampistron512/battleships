@@ -1,53 +1,52 @@
-# Bataille navale
+# Bataille navale (terminal Python)
 
-Ce programme permet de jouer à la bataille navale.
+Ce projet propose une version simple de la bataille navale en terminal.
 
-## Table des matières
-- [Installation](#installation)
-- [Utilisation](#utilisation)
-- [Règles du jeu](#règles-du-jeu)
-- [Fonctionnalités](#fonctionnalités)
-- [Structure du code](#structure-du-code)
+## Installation
 
-### Installation
+1. Assurez-vous d'avoir Python 3 installé.
+2. Clonez le dépôt.
+3. Lancez le jeu :
 
-1. Assurez-vous d’avoir **Python 3** installé sur votre machine.
-2. Téléchargez les fichiers suivants dans un répertoire de votre choix :
-    
-    - `battleships.py`
-    - `UserInput.py`
-    - `Ship.py`
-    - `Grid.py`
-3. Ouvrez un terminal et exécutez le script : `python battleships.py`
+```bash
+python battleships.py
+```
 
-### Utilisation
+## Utilisation
 
-Lancez le script. Le jeu commence.
+Le jeu vous demande des coordonnées de tir.
 
-Rentrez une coordonnée correspondant à une case de la grille et appuyez sur *Entrée*.
+Formats acceptés : `A1`, `c7`, `J10`.
 
-### Règles du jeu
+Pour quitter : `q`.
 
-Il s'agit d'une transposition du jeu de la bataille navale. Des navires sont placés sur une grille et se voient
-attribuer des coordonnées.  
-  Si l'utilisateur tire sur la bonne case, le navire est touché. Si toutes les cases occupées par le navire sont
-atteintes, alors le navire est coulé. Quand tous les navires sont coulés, le jeu se termine.
+## Règles du jeu
 
-### Fonctionnalités
+- Si le tir touche un navire : `touché`
+- Si toutes les cases d'un navire sont touchées : `coulé !!!`
+- Quand tous les navires sont coulés : `GAME OVER`
 
-Propose à un seul joueur de tirer sur une grille et de jouer à la bataille navale
+## Structure du code
 
-### Structure du code
+- `battleships.py` : boucle principale + classe `Game`
+- `UserInput.py` : validation et normalisation des coordonnées
+- `Ship.py` : modèle navire (coordonnées, impacts, état coulé)
+- `Grid.py` : rendu de la grille
+- `tests/` : tests unitaires de base
 
-Le programme se compose de 4 fichiers :
+## Lancer les tests
 
-- **`battleships.py`**  
- Fichier principal qui va s'occuper de la logique du jeu et importer les différentes classes.
-- **`UserInput.py`**  
- Classe permettant de gérer les inputs utilisateur
-- **`Ship.py`**  
- Classe contenant les fonctionnalités liées aux données des navires, et permettant de tirer
-- **`Grid.py`**  
- Classe effectuant l'affichage de la grille
+```bash
+python -m unittest discover -s tests
+```
 
+## Limitations connues
 
+- Placement des navires statique (pas encore aléatoire)
+- Jeu solo uniquement
+
+## Roadmap
+
+- Ajouter un placement aléatoire des navires
+- Ajouter un mode debug pour afficher les navires non touchés
+- Ajouter plus de tests sur l'affichage de la grille
