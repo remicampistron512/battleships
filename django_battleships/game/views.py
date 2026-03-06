@@ -3,19 +3,47 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
-from .logic import GRID_SIZE, apply_shot, board_remaining_ships, new_state, next_enemy_target
+from .logic import GRID_SIZE, apply_shot, board_remaining_ships, new_state_for_size, next_enemy_target
+from .models import GameSettings
 
 
 @require_GET
 def index(request):
-    return render(request, 'game/index.html')
+    settings = GameSettings.load()
+    return render(
+        request,
+        'game/index.html',
+        {
+            'ui_config': {
+                'grid_size': settings.grid_size,
+                'water_color': settings.water_color,
+                'grid_line_color': settings.grid_line_color,
+                'hit_color': settings.hit_color,
+                'miss_color': settings.miss_color,
+                'ship_color': settings.ship_color,
+            }
+        },
+    )
 
 
 @require_POST
 def new_game(request):
-    state = new_state()
+    settings = GameSettings.load()
+    state = new_state_for_size(settings.grid_size)
     request.session['battleships_state'] = state
-    return JsonResponse({'grid_size': GRID_SIZE, 'status': state['status']})
+    return JsonResponse(
+        {
+            'grid_size': state.get('grid_size', GRID_SIZE),
+            'status': state['status'],
+            'ui': {
+                'water_color': settings.water_color,
+                'grid_line_color': settings.grid_line_color,
+                'hit_color': settings.hit_color,
+                'miss_color': settings.miss_color,
+                'ship_color': settings.ship_color,
+            },
+        }
+    )
 
 
 @require_POST
@@ -29,7 +57,8 @@ def fire(request):
     col = payload.get('col')
     if not isinstance(row, int) or not isinstance(col, int):
         return JsonResponse({'error': 'row and col must be integers.'}, status=400)
-    if row < 0 or col < 0 or row >= GRID_SIZE or col >= GRID_SIZE:
+    state_grid_size = state.get('grid_size', GRID_SIZE)
+    if row < 0 or col < 0 or row >= state_grid_size or col >= state_grid_size:
         return JsonResponse({'error': 'Shot is outside the board.'}, status=400)
 
     player_result = apply_shot(state['enemy_board'], row, col)
