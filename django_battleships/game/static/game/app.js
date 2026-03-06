@@ -10,6 +10,9 @@
   var gridSize = initialConfig.grid_size || 10;
   var boardSize = 420;
   var cellSize = boardSize / gridSize;
+  var animationTime = 0;
+  var lastTimestamp = 0;
+  var animationFrameId = null;
   var colors = {
     water: initialConfig.water_color || '#0369a1',
     gridLine: initialConfig.grid_line_color || '#7dd3fc',
@@ -96,8 +99,8 @@
 
     function drawBoards() {
       resizeCanvases();
-      drawBoard('enemyCanvas', vm.playerView, false);
-      drawBoard('playerCanvas', vm.playerBoard, true);
+      drawBoard('enemyCanvas', vm.playerView, false, animationTime);
+      drawBoard('playerCanvas', vm.playerBoard, true, animationTime + 0.9);
     }
 
     function resizeCanvases() {
@@ -109,41 +112,188 @@
       });
     }
 
-    function drawBoard(canvasId, board, revealShips) {
+    function drawBoard(canvasId, board, revealShips, timeValue) {
       var canvas = document.getElementById(canvasId);
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawOceanBackground(ctx, timeValue);
+      drawSunRays(ctx, timeValue);
 
       for (var row = 0; row < gridSize; row += 1) {
         for (var col = 0; col < gridSize; col += 1) {
           var x = col * cellSize;
           var y = row * cellSize;
-          ctx.fillStyle = colors.water;
-          ctx.fillRect(x, y, cellSize, cellSize);
+          drawWaterCell(ctx, row, col, x, y, timeValue);
           ctx.strokeStyle = colors.gridLine;
+          ctx.lineWidth = 1;
           ctx.strokeRect(x, y, cellSize, cellSize);
 
           var cell = board[row][col];
           if (cell === 'X') {
-            drawMarker(ctx, x, y, colors.hit, 'X');
+            drawHitMarker(ctx, x, y, timeValue);
           } else if (cell === 'O') {
-            drawMarker(ctx, x, y, colors.miss, '•');
+            drawMissMarker(ctx, x, y, timeValue);
           } else if (cell === 'S' && revealShips) {
-            drawMarker(ctx, x, y, colors.ship, '■');
+            drawShipMarker(ctx, x, y, timeValue);
           }
         }
       }
+
+      drawCausticsOverlay(ctx, timeValue);
+      drawEdgeGlow(ctx, timeValue);
     }
 
-    function drawMarker(ctx, x, y, color, marker) {
+    function drawOceanBackground(ctx, timeValue) {
+      var gradient = ctx.createLinearGradient(0, 0, boardSize, boardSize);
+      gradient.addColorStop(0, shadeHex(colors.water, 42));
+      gradient.addColorStop(0.45, shadeHex(colors.water, 18));
+      gradient.addColorStop(1, shadeHex(colors.water, -8));
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, boardSize, boardSize);
+
+      var shimmer = ctx.createRadialGradient(
+        boardSize * (0.15 + 0.02 * Math.sin(timeValue * 0.4)),
+        boardSize * 0.1,
+        boardSize * 0.02,
+        boardSize * 0.3,
+        boardSize * 0.2,
+        boardSize * 0.65
+      );
+      shimmer.addColorStop(0, 'rgba(186, 230, 253, 0.2)');
+      shimmer.addColorStop(1, 'rgba(186, 230, 253, 0)');
+      ctx.fillStyle = shimmer;
+      ctx.fillRect(0, 0, boardSize, boardSize);
+    }
+
+    function drawSunRays(ctx, timeValue) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      for (var i = 0; i < 6; i += 1) {
+        var rayX = boardSize * (0.12 + i * 0.15 + 0.01 * Math.sin(timeValue + i));
+        var ray = ctx.createLinearGradient(rayX, 0, rayX + 24, boardSize);
+        ray.addColorStop(0, 'rgba(224, 242, 254, 0.14)');
+        ray.addColorStop(1, 'rgba(224, 242, 254, 0)');
+        ctx.fillStyle = ray;
+        ctx.fillRect(rayX - 14, 0, 44, boardSize);
+      }
+      ctx.restore();
+    }
+
+    function drawWaterCell(ctx, row, col, x, y, timeValue) {
+      var wave =
+        Math.sin((col * 0.7 + timeValue * 1.8)) +
+        Math.cos((row * 0.85 - timeValue * 1.4));
+      var alpha = 0.08 + (wave + 2) * 0.04;
+      var texture = ctx.createLinearGradient(x, y, x + cellSize, y + cellSize);
+      texture.addColorStop(0, 'rgba(224, 242, 254,' + alpha.toFixed(3) + ')');
+      texture.addColorStop(1, 'rgba(14, 116, 144, 0.02)');
+      ctx.fillStyle = texture;
+      ctx.fillRect(x, y, cellSize, cellSize);
+    }
+
+    function drawCausticsOverlay(ctx, timeValue) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.15)';
+      ctx.lineWidth = 1.1;
+      for (var i = 0; i < gridSize + 4; i += 1) {
+        ctx.beginPath();
+        for (var x = 0; x <= boardSize; x += 10) {
+          var y =
+            (i * cellSize * 0.55 +
+              Math.sin(x * 0.024 + timeValue * 1.5 + i * 0.8) * 5 +
+              Math.cos(x * 0.016 - timeValue * 1.1) * 3) %
+            boardSize;
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawEdgeGlow(ctx, timeValue) {
+      var glow = ctx.createLinearGradient(0, 0, boardSize, boardSize);
+      glow.addColorStop(0, 'rgba(125, 211, 252, 0.35)');
+      glow.addColorStop(0.5, 'rgba(125, 211, 252, 0.08)');
+      glow.addColorStop(1, 'rgba(125, 211, 252, 0.25)');
+      ctx.strokeStyle = glow;
+      ctx.lineWidth = 2.5 + Math.sin(timeValue * 1.2) * 0.25;
+      ctx.strokeRect(1.25, 1.25, boardSize - 2.5, boardSize - 2.5);
+    }
+
+    function drawShipMarker(ctx, x, y, timeValue) {
+      drawMarker(ctx, x, y, colors.ship, '■', 26, 0.85);
+      ctx.save();
+      ctx.globalAlpha = 0.22 + 0.07 * Math.sin(timeValue * 2.2);
+      ctx.fillStyle = '#dcfce7';
+      ctx.fillRect(x + cellSize * 0.2, y + cellSize * 0.2, cellSize * 0.6, cellSize * 0.18);
+      ctx.restore();
+    }
+
+    function drawMissMarker(ctx, x, y, timeValue) {
+      var pulse = 0.9 + 0.06 * Math.sin(timeValue * 3.1 + x * 0.05 + y * 0.03);
+      drawMarker(ctx, x, y, colors.miss, '•', 30 * pulse, 0.96);
+    }
+
+    function drawHitMarker(ctx, x, y, timeValue) {
+      var pulse = 0.84 + 0.18 * Math.sin(timeValue * 6.2 + x * 0.06 + y * 0.04);
+      ctx.save();
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.26)';
+      ctx.beginPath();
+      ctx.arc(x + cellSize / 2, y + cellSize / 2, cellSize * pulse * 0.36, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      drawMarker(ctx, x, y, colors.hit, '✕', 26 + pulse * 2, 1);
+    }
+
+    function drawMarker(ctx, x, y, color, marker, fontSize, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha || 1;
       ctx.fillStyle = color;
-      ctx.font = '28px Arial';
+      ctx.font = (fontSize || 28) + 'px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.4)';
+      ctx.shadowBlur = 6;
       ctx.fillText(marker, x + cellSize / 2, y + cellSize / 2);
+      ctx.restore();
     }
 
-    drawBoards();
+    function shadeHex(hex, amount) {
+      var color = hex.replace('#', '');
+      if (color.length === 3) {
+        color =
+          color[0] + color[0] + color[1] + color[1] + color[2] + color[2];
+      }
+      var num = parseInt(color, 16);
+      var r = clampColor((num >> 16) + amount);
+      var g = clampColor(((num >> 8) & 0x00ff) + amount);
+      var b = clampColor((num & 0x0000ff) + amount);
+      return 'rgb(' + r + ',' + g + ',' + b + ')';
+    }
+
+    function clampColor(value) {
+      return Math.max(0, Math.min(255, Math.round(value)));
+    }
+
+    function animate(timestamp) {
+      if (!lastTimestamp) {
+        lastTimestamp = timestamp;
+      }
+      var deltaSeconds = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+      animationTime += Math.min(deltaSeconds, 0.05);
+      drawBoards();
+      animationFrameId = window.requestAnimationFrame(animate);
+    }
+
+    if (!animationFrameId) {
+      animationFrameId = window.requestAnimationFrame(animate);
+    }
   });
 })();
