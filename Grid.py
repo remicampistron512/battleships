@@ -1,66 +1,39 @@
 class Grid:
     cols_headings = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     rows_headings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    miss_list = []
-    def __init__(self, ships=None):
-        self.ships = ships
-
-
-    @classmethod
-    def create_rows(cls, ships,misses_list):
-        """
-        Créer la grille sans les entêtes
-        :param ships: la liste des navires membre de la classe Ship
-        :param miss_list:
-        :return:
-        """
-        i = 0
-        j = 0
-        for row in cls.rows_headings:
-            print("+---" * (len(Grid.cols_headings) + 1) + "+")
-            print(f"{row:>2}", end='  | ')
-
-            for col in cls.cols_headings:
-                ship_in_square = False
-                ship_hit_in_square = False
-                missed_square = False
-                for ship in ships:
-                    for ship_hit_coordinate in ship.hit_list:
-                        if ship_hit_coordinate == col.lower() + "" + str(row).lower():
-                            print("Ø", end=" | ")
-                            ship_hit_in_square = True
-                            continue
-                    if not ship_hit_in_square:
-                        for ship_coordinates in ship.coordinates_list:
-                            if ship_coordinates == col.lower() + "" + str(row).lower():
-                                print("o", end=" | ")
-                                ship_in_square = True
-                if not ship_in_square and not ship_hit_in_square:
-                    for miss in misses_list:
-                        if miss == col.lower() + "" + str(row).lower():
-                            print("x", end=" | ")
-                            missed_square = True
-
-                if not ship_in_square and not ship_hit_in_square and not missed_square:
-                    print(" ", end=" | ")
-            print("\r")
-
-            i += 1
-        j += 1
 
     @classmethod
     def create_col_headings(cls):
-        """
-         Créer les entêtes de la grille
-        :return:
-        """
         print("+---" * (len(cls.cols_headings) + 1) + "+")
-        i = 0
-        for col in cls.cols_headings:
-            if i == 0:
-                print("     "f"{col:>2}", end=" |")
-            elif i == len(cls.cols_headings) - 1:
+        for index, col in enumerate(cls.cols_headings):
+            if index == 0:
+                print("     " f"{col:>2}", end=" |")
+            elif index == len(cls.cols_headings) - 1:
                 print(f"{col:>2}", end=' |\n')
             else:
                 print(f"{col:>2}", end=' |')
-            i += 1
+
+    @classmethod
+    def create_rows(cls, ships, misses_list, show_ships=False):
+        """Crée la grille sans les entêtes."""
+
+        hit_coordinates = {coordinate for ship in ships for coordinate in ship.hit_list}
+        ship_coordinates = {coordinate for ship in ships for coordinate in ship.coordinates_list}
+        misses = set(misses_list)
+
+        for row in cls.rows_headings:
+            print("+---" * (len(cls.cols_headings) + 1) + "+")
+            print(f"{row:>2}", end='  | ')
+
+            for col in cls.cols_headings:
+                current_coordinate = f"{col.lower()}{row}"
+                if current_coordinate in hit_coordinates:
+                    symbol = "Ø"
+                elif current_coordinate in misses:
+                    symbol = "x"
+                elif show_ships and current_coordinate in ship_coordinates:
+                    symbol = "o"
+                else:
+                    symbol = " "
+                print(symbol, end=" | ")
+            print("\r")
