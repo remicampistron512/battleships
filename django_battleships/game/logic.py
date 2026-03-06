@@ -4,23 +4,29 @@ GRID_SIZE = 10
 SHIP_LENGTHS = (5, 4, 3, 3, 2)
 
 
-def empty_grid():
-    return [['~' for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+def ship_lengths_for_grid(grid_size):
+    if grid_size < GRID_SIZE:
+        return tuple(length for length in SHIP_LENGTHS if length <= grid_size)
+    return SHIP_LENGTHS
 
 
-def place_ships():
-    grid = empty_grid()
-    for length in SHIP_LENGTHS:
+def empty_grid(grid_size):
+    return [['~' for _ in range(grid_size)] for _ in range(grid_size)]
+
+
+def place_ships(grid_size):
+    grid = empty_grid(grid_size)
+    for length in ship_lengths_for_grid(grid_size):
         placed = False
         while not placed:
             horizontal = random.choice((True, False))
             if horizontal:
-                row = random.randint(0, GRID_SIZE - 1)
-                col = random.randint(0, GRID_SIZE - length)
+                row = random.randint(0, grid_size - 1)
+                col = random.randint(0, grid_size - length)
                 cells = [(row, col + offset) for offset in range(length)]
             else:
-                row = random.randint(0, GRID_SIZE - length)
-                col = random.randint(0, GRID_SIZE - 1)
+                row = random.randint(0, grid_size - length)
+                col = random.randint(0, grid_size - 1)
                 cells = [(row + offset, col) for offset in range(length)]
 
             if all(grid[r][c] == '~' for r, c in cells):
@@ -31,12 +37,17 @@ def place_ships():
 
 
 def new_state():
+    return new_state_for_size(GRID_SIZE)
+
+
+def new_state_for_size(grid_size):
     return {
-        'player_board': place_ships(),
-        'enemy_board': place_ships(),
-        'player_view': empty_grid(),
+        'player_board': place_ships(grid_size),
+        'enemy_board': place_ships(grid_size),
+        'player_view': empty_grid(grid_size),
         'enemy_shots': [],
         'status': 'active',
+        'grid_size': grid_size,
     }
 
 
@@ -56,11 +67,12 @@ def apply_shot(board, target_row, target_col):
 
 
 def next_enemy_target(state):
+    grid_size = state.get('grid_size', GRID_SIZE)
     attempted = {(entry['row'], entry['col']) for entry in state['enemy_shots']}
     candidates = [
         (r, c)
-        for r in range(GRID_SIZE)
-        for c in range(GRID_SIZE)
+        for r in range(grid_size)
+        for c in range(grid_size)
         if (r, c) not in attempted
     ]
     return random.choice(candidates) if candidates else None

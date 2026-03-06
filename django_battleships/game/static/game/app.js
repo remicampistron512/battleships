@@ -1,7 +1,17 @@
 (function () {
   var app = angular.module('battleshipsApp', []);
-  var gridSize = 10;
-  var cellSize = 40;
+  var uiConfigElement = document.getElementById('ui-config');
+  var initialConfig = uiConfigElement ? JSON.parse(uiConfigElement.textContent) : {};
+  var gridSize = initialConfig.grid_size || 10;
+  var boardSize = 420;
+  var cellSize = boardSize / gridSize;
+  var colors = {
+    water: initialConfig.water_color || '#0369a1',
+    gridLine: initialConfig.grid_line_color || '#7dd3fc',
+    hit: initialConfig.hit_color || '#ef4444',
+    miss: initialConfig.miss_color || '#f8fafc',
+    ship: initialConfig.ship_color || '#22c55e',
+  };
 
   app.controller('GameController', function ($http) {
     var vm = this;
@@ -12,8 +22,17 @@
     vm.startNewGame = function () {
       $http.post('/api/new-game/').then(function (response) {
         gridSize = response.data.grid_size;
+        cellSize = boardSize / gridSize;
+        colors = {
+          water: response.data.ui.water_color,
+          gridLine: response.data.ui.grid_line_color,
+          hit: response.data.ui.hit_color,
+          miss: response.data.ui.miss_color,
+          ship: response.data.ui.ship_color,
+        };
         vm.playerView = buildEmpty();
         vm.playerBoard = buildEmpty();
+        resizeCanvases();
         vm.statusMessage = 'Game started. Fire at enemy waters.';
         drawBoards();
       });
@@ -71,8 +90,18 @@
     }
 
     function drawBoards() {
+      resizeCanvases();
       drawBoard('enemyCanvas', vm.playerView, false);
       drawBoard('playerCanvas', vm.playerBoard, true);
+    }
+
+    function resizeCanvases() {
+      ['enemyCanvas', 'playerCanvas'].forEach(function (canvasId) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        canvas.width = boardSize;
+        canvas.height = boardSize;
+      });
     }
 
     function drawBoard(canvasId, board, revealShips) {
@@ -85,18 +114,18 @@
         for (var col = 0; col < gridSize; col += 1) {
           var x = col * cellSize;
           var y = row * cellSize;
-          ctx.fillStyle = '#0369a1';
+          ctx.fillStyle = colors.water;
           ctx.fillRect(x, y, cellSize, cellSize);
-          ctx.strokeStyle = '#7dd3fc';
+          ctx.strokeStyle = colors.gridLine;
           ctx.strokeRect(x, y, cellSize, cellSize);
 
           var cell = board[row][col];
           if (cell === 'X') {
-            drawMarker(ctx, x, y, '#ef4444', 'X');
+            drawMarker(ctx, x, y, colors.hit, 'X');
           } else if (cell === 'O') {
-            drawMarker(ctx, x, y, '#f8fafc', '•');
+            drawMarker(ctx, x, y, colors.miss, '•');
           } else if (cell === 'S' && revealShips) {
-            drawMarker(ctx, x, y, '#22c55e', '■');
+            drawMarker(ctx, x, y, colors.ship, '■');
           }
         }
       }

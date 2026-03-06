@@ -12,6 +12,7 @@
     <main>
       <h1>Battleships</h1>
       <p>Back-end: Django API. Front-end: AngularJS + Canvas UI.</p>
+      <p><a href="/admin/">Admin settings</a> (configure grid size and colors).</p>
       <button ng-click="game.startNewGame()">Start New Game</button>
       <p class="status">{{ game.statusMessage }}</p>
 
@@ -31,6 +32,7 @@
         </div>
       </section>
     </main>
+    {{ ui_config|json_script:"ui-config" }}
     <script src="/static/game/app.js"></script>
   </body>
 </html>
